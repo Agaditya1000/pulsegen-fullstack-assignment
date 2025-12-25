@@ -1,15 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 
-const VideoPlayer = ({ videoId, token }) => {
+const VideoPlayer = ({ videoId }) => {
     const videoRef = useRef(null);
+    const token = localStorage.getItem('token');
 
-    useEffect(() => {
-        if (videoRef.current) {
-            // If we needed custom headers for auth, we'd need to fetch blob or use service worker.
-            // For now, using query param token if needed or just direct URL.
-            // videoRef.current.src = `http://localhost:5000/api/videos/stream/${videoId}?token=${token}`;
-        }
-    }, [videoId, token]);
+    // ...
 
     return (
         <div className="w-full max-w-4xl mx-auto bg-black rounded-lg overflow-hidden shadow-xl">
@@ -19,7 +14,7 @@ const VideoPlayer = ({ videoId, token }) => {
                 width="100%"
                 height="auto"
                 className="w-full h-auto"
-                src={`http://localhost:5000/api/videos/stream/${videoId}`} // Simplified for demo
+                src={`http://localhost:5000/api/videos/stream/${videoId}?token=${token}`}
             >
                 Your browser does not support the video tag.
             </video>
