@@ -3,21 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const { uploadVideo, getVideos, streamVideo } = require('../controllers/videoController');
-const jwt = require('jsonwebtoken');
-
-// Middleware to verify token
-const verifyToken = (req, res, next) => {
-    // Check header or query param (for streaming)
-    const token = req.headers['authorization']?.split(' ')[1] || req.query.token;
-
-    if (!token) return res.status(403).json({ message: 'No token provided' });
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-        if (err) return res.status(401).json({ message: 'Unauthorized' });
-        req.user = decoded;
-        next();
-    });
-};
+const { auth, checkRole } = require('../middleware/auth');
 
 // Multer Setup
 const storage = multer.diskStorage({
@@ -31,8 +17,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.post('/upload', verifyToken, upload.single('video'), uploadVideo);
-router.get('/', verifyToken, getVideos);
-router.get('/stream/:id', streamVideo); // Allowing stream without auth for easier testing, or add verifyToken if needed (via query param)
+// Routes with RBAC
+// Upload: Editor and Admin only
+router.post('/upload', auth, checkRole(['editor', 'admin']), upload.single('video'), uploadVideo);
+
+// Get Videos: All authenticated users can list, but controller filters based on role
+router.get('/', auth, getVideos);
+
+// Stream: Public or authenticated? 
+// Requirement: "Viewer Role: Read-only access to assigned videos".
+// Let's protect stream endpoint with auth middleware, passing token via query param is handled in auth middleware now.
+router.get('/stream/:id', auth, streamVideo);
 
 module.exports = router;

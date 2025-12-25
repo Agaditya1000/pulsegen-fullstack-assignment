@@ -12,6 +12,8 @@ exports.uploadVideo = async (req, res) => {
             path: req.file.path,
             uploader: req.user.id,
             size: req.file.size,
+            isPublic: req.body.isPublic === 'true',
+            allowedUsers: req.body.allowedUsers ? JSON.parse(req.body.allowedUsers) : [],
             status: 'processing'
         });
         await video.save();
@@ -38,29 +40,21 @@ exports.getVideos = async (req, res) => {
     try {
         const { role, id } = req.user;
         let query = {};
-        if (role === 'viewer') {
-            query = { status: 'safe' }; // Viewers only see safe videos? Or maybe all? Req says "User Isolation" and "Viewing".
-            // Let's assume for now they see all, or we filter by safe.
-            // Requirement: "Viewer Role: Read-only access to assigned videos".
-            // "Multi-Tenant: Each user accesses only their own video content".
-            // This conflicts slightly. Let's assume:
-            // - Viewers see videos assigned to them (not impl yet) OR public ones.
-            // - Users see their own uploads.
-            // For now, let's implement: Users see their own videos. Admin see all?
-            // "User Isolation: Each user accesses only their own video content".
-            // So simple filter: uploader: id.
-            // query = { uploader: id };
-        }
-        // Actually, let's implement a simple list for now. If admin/editor, implement RBAC fully later.
-        // For now: return all videos for simplicity of demo, or implement basic isolation.
-        // Let's do isolation:
-        if (role !== 'admin') {
-            // If "User Isolation", maybe they can only see what they uploaded?
-            // But "Streaming Service" implies viewing content.
-            // Let's return all 'safe' videos for viewers, and all videos for uploader.
-            // Wait, "User Isolation: Each user accesses only their own video content" -> THIS means it's like a personal drive.
-            // So:
+        if (role === 'admin') {
+            // Admins see everything
+            query = {};
+        } else if (role === 'editor') {
+            // Editors see their own videos
             query = { uploader: id };
+        } else {
+            // Viewers see public videos or videos assigned to them
+            query = {
+                $or: [
+                    { isPublic: true },
+                    { allowedUsers: id }
+                ],
+                status: 'safe' // Viewers only see safe content
+            };
         }
 
         const videos = await Video.find(query).populate('uploader', 'username');
