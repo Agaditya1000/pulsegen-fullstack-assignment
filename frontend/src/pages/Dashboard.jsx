@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import axios from 'axios';
 import { io } from 'socket.io-client';
@@ -221,9 +222,9 @@ const Dashboard = () => {
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in slide-in-from-bottom-8 duration-1000 delay-200">
-                        <a href="/register" className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-lg shadow-xl shadow-blue-500/20 hover:scale-105 hover:shadow-blue-500/40 transition-all duration-300 w-full sm:w-auto">
+                        <Link to="/register" className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-lg shadow-xl shadow-blue-500/20 hover:scale-105 hover:shadow-blue-500/40 transition-all duration-300 w-full sm:w-auto">
                             Start for Free
-                        </a>
+                        </Link>
                         <button className="px-8 py-4 bg-gray-800 text-white rounded-xl font-bold text-lg border border-gray-700 hover:bg-gray-700 hover:border-gray-600 transition-all duration-300 flex items-center gap-2 w-full sm:w-auto justify-center group">
                             <Play className="w-5 h-5 group-hover:text-blue-400 transition-colors" /> Watch Demo
                         </button>
