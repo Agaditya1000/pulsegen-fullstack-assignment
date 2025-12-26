@@ -36,17 +36,17 @@ const AdminPanel = () => {
             const headers = { Authorization: `Bearer ${token}` };
 
             if (activeTab === 'users' || activeTab === 'dashboard') {
-                const res = await axios.get('http://localhost:5000/api/users', { headers });
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/users`, { headers });
                 setUsers(res.data);
             }
 
             if (activeTab === 'settings') {
-                const res = await axios.get('http://localhost:5000/api/settings', { headers });
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/settings`, { headers });
                 setSettings(res.data);
             }
 
             if (activeTab === 'content') {
-                const res = await axios.get('http://localhost:5000/api/videos', { headers });
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/videos`, { headers });
                 setFlaggedVideos(res.data.filter(v => v.status === 'flagged'));
             }
         } catch (error) {
@@ -68,7 +68,7 @@ const AdminPanel = () => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:5000/api/users/${id}`, {
+            await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUsers(users.filter(u => u._id !== id));
@@ -81,7 +81,7 @@ const AdminPanel = () => {
     const handleRoleUpdate = async (id, newRole) => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.put(`http://localhost:5000/api/users/${id}/role`, { role: newRole }, {
+            const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/users/${id}/role`, { role: newRole }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUsers(users.map(u => u._id === id ? res.data : u));
@@ -95,7 +95,7 @@ const AdminPanel = () => {
         setSaving(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.put('http://localhost:5000/api/settings', settings, {
+            await axios.put(`${import.meta.env.VITE_API_URL}/api/settings`, settings, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             showNotification('success', 'System settings saved');
@@ -110,7 +110,7 @@ const AdminPanel = () => {
         if (!window.confirm(`Are you sure you want to ${action} this video?`)) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:5000/api/videos/${videoId}/review`, { action }, {
+            await axios.put(`${import.meta.env.VITE_API_URL}/api/videos/${videoId}/review`, { action }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setFlaggedVideos(flaggedVideos.filter(v => v._id !== videoId));
@@ -185,8 +185,8 @@ const AdminPanel = () => {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all whitespace-nowrap ${activeTab === tab.id
-                                    ? 'bg-blue-600 text-white shadow-lg'
-                                    : 'text-gray-400 hover:text-white hover:bg-gray-600'
+                                ? 'bg-blue-600 text-white shadow-lg'
+                                : 'text-gray-400 hover:text-white hover:bg-gray-600'
                                 }`}
                         >
                             <tab.icon size={18} />

@@ -14,7 +14,7 @@ const VideoPlayer = ({ videoId }) => {
                 width="100%"
                 height="auto"
                 className="w-full h-auto"
-                src={`http://localhost:5000/api/videos/stream/${videoId}?token=${token}`}
+                src={`${import.meta.env.VITE_API_URL}/api/videos/stream/${videoId}?token=${token}`}
             >
                 Your browser does not support the video tag.
             </video>

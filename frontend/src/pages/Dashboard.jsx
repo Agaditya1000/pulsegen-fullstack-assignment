@@ -31,7 +31,7 @@ const Dashboard = () => {
     const [notification, setNotification] = useState(null); // { type: 'error' | 'success', message: '' }
 
     useEffect(() => {
-        const newSocket = io('http://localhost:5000');
+        const newSocket = io(import.meta.env.VITE_API_URL);
         setSocket(newSocket);
 
         newSocket.on('video_processed', ({ videoId, status }) => {
@@ -47,7 +47,7 @@ const Dashboard = () => {
     const fetchVideos = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/videos', {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/videos`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setVideos(res.data);
@@ -69,7 +69,7 @@ const Dashboard = () => {
 
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:5000/api/videos/${videoId}`, {
+            await axios.delete(`${import.meta.env.VITE_API_URL}/api/videos/${videoId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setVideos(videos.filter(v => v._id !== videoId));
@@ -90,7 +90,7 @@ const Dashboard = () => {
 
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/users', {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/users`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // Filter out self and admins if needed, or just show all
@@ -115,7 +115,7 @@ const Dashboard = () => {
                 formData.append('video', editFile);
             }
 
-            const res = await axios.put(`http://localhost:5000/api/videos/${editingVideo._id}`, formData, {
+            const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/videos/${editingVideo._id}`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
@@ -140,7 +140,7 @@ const Dashboard = () => {
             // Proactively fetch users for assignment
             try {
                 const token = localStorage.getItem('token');
-                const res = await axios.get('http://localhost:5000/api/users', {
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/users`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setAvailableUsers(res.data.filter(u => u._id !== user.id));
@@ -163,7 +163,7 @@ const Dashboard = () => {
         setUploading(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/api/videos/upload', formData, {
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/videos/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`
